@@ -26,6 +26,7 @@ import com.badlogic.gdx.Gdx;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
+import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
@@ -43,6 +44,12 @@ public class HeadlessScene extends Scene {
 	private static final String PROP_SEED = "headless.seed";
 	private static final String PROP_SLOT = "headless.slot";
 	private static final String PROP_BASE_PATH = "headless.basePath";
+
+	// Static fields that the headed UI can set before switching to this scene.
+	// When non-null/-1, these take precedence over system properties.
+	public static int uiSteps = -1;
+	public static HeroClass uiHeroClass = null;
+	public static String uiSeed = null;
 
 	private Thread actorThread;
 	private int stepsRemaining;
@@ -87,6 +94,9 @@ public class HeadlessScene extends Scene {
 	}
 
 	private void configureStorage() {
+		// Only override the save path when running under a true headless application;
+		// in headed mode the desktop launcher has already configured the correct path.
+		if (Game.platform == null || !Game.platform.isHeadless()) return;
 		String basePath = System.getProperty(PROP_BASE_PATH, "/tmp/shpd-headless/");
 		if (!basePath.endsWith("/")) {
 			basePath += "/";
@@ -103,7 +113,7 @@ public class HeadlessScene extends Scene {
 		Dungeon.daily = false;
 		Dungeon.dailyReplay = false;
 
-		String seed = System.getProperty(PROP_SEED, "");
+		String seed = (uiSeed != null) ? uiSeed : System.getProperty(PROP_SEED, "");
 		SPDSettings.customSeed(seed.trim());
 
 		Dungeon.initSeed();
@@ -113,6 +123,7 @@ public class HeadlessScene extends Scene {
 	}
 
 	private int readSteps() {
+		if (uiSteps > 0) return uiSteps;
 		String stepsValue = System.getProperty(PROP_STEPS);
 		if (stepsValue == null) {
 			return DEFAULT_STEPS;
@@ -138,6 +149,7 @@ public class HeadlessScene extends Scene {
 	}
 
 	private HeroClass readHeroClass() {
+		if (uiHeroClass != null) return uiHeroClass;
 		String heroClassValue = System.getProperty(PROP_HERO_CLASS);
 		if (heroClassValue != null && !heroClassValue.trim().isEmpty()) {
 			try {
@@ -187,6 +199,14 @@ public class HeadlessScene extends Scene {
 				+ " heroPos=" + (Dungeon.hero == null ? "none" : Dungeon.hero.pos)
 				+ " time=" + Actor.now());
 		stopActorThread();
-		Game.instance.finish();
+		// Clear the static UI config so they don't bleed into a subsequent run.
+		uiSteps = -1;
+		uiHeroClass = null;
+		uiSeed = null;
+		if (Game.platform != null && Game.platform.isHeadless()) {
+			Game.instance.finish();
+		} else {
+			ShatteredPixelDungeon.switchNoFade(TitleScene.class);
+		}
 	}
 }

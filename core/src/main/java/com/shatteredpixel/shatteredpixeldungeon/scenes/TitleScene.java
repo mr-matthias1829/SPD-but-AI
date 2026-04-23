@@ -42,6 +42,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
 import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.TitleBackground;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndAIRun;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndSettings;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndVictoryCongrats;
@@ -76,6 +77,7 @@ public class TitleScene extends PixelScene {
 	private StyledButton btnChanges;
 	private StyledButton btnSettings;
 	private StyledButton btnAbout;
+	private StyledButton btnAIRun;
 
 	private BitmapText version;
 	private IconButton btnFade;
@@ -212,9 +214,18 @@ public class TitleScene extends PixelScene {
 		};
 		btnAbout.icon(Icons.get(Icons.SHPX));
 		add(btnAbout);
+
+		btnAIRun = new StyledButton(GREY_TR, "AI Run"){
+			@Override
+			protected void onClick() {
+				ShatteredPixelDungeon.scene().add(new WndAIRun());
+			}
+		};
+		btnAIRun.icon(Icons.get(Icons.TARGET));
+		add(btnAIRun);
 		
 		final int BTN_HEIGHT = 20;
-		int GAP = (int)(h - topRegion - (landscape() ? 3 : 4)*BTN_HEIGHT)/3;
+		int GAP = (int)(h - topRegion - (landscape() ? 4 : 5)*BTN_HEIGHT)/3;
 		GAP /= landscape() ? 3 : 5;
 		GAP = Math.max(GAP, 2);
 
@@ -230,6 +241,7 @@ public class TitleScene extends PixelScene {
 			btnSettings.setRect(btnRankings.left(), btnRankings.bottom() + GAP, btnRankings.width(), BTN_HEIGHT);
 			btnChanges.setRect(btnSettings.right()+2, btnSettings.top(), btnRankings.width(), BTN_HEIGHT);
 			btnAbout.setRect(btnChanges.right()+2, btnSettings.top(), btnRankings.width(), BTN_HEIGHT);
+			btnAIRun.setRect(btnRankings.left(), btnSettings.bottom() + GAP, buttonAreaWidth, BTN_HEIGHT);
 		} else {
 			btnPlay.setRect(btnAreaLeft, insets.top + topRegion+GAP, buttonAreaWidth, BTN_HEIGHT);
 			align(btnPlay);
@@ -240,6 +252,7 @@ public class TitleScene extends PixelScene {
 			btnChanges.setRect(btnNews.right()+2, btnNews.top(), btnNews.width(), BTN_HEIGHT);
 			btnSettings.setRect(btnNews.left(), btnNews.bottom()+GAP, btnRankings.width(), BTN_HEIGHT);
 			btnAbout.setRect(btnSettings.right()+2, btnSettings.top(), btnSettings.width(), BTN_HEIGHT);
+			btnAIRun.setRect(btnSettings.left(), btnSettings.bottom()+GAP, buttonAreaWidth, BTN_HEIGHT);
 		}
 
 		version = new BitmapText( "v" + Game.version, pixelFont);
@@ -322,6 +335,7 @@ public class TitleScene extends PixelScene {
 		btnChanges.enable(alpha != 0);
 		btnSettings.enable(alpha != 0);
 		btnAbout.enable(alpha != 0);
+		btnAIRun.enable(alpha != 0);
 
 		btnPlay.alpha(alpha);
 		btnSupport.alpha(alpha);
@@ -331,6 +345,7 @@ public class TitleScene extends PixelScene {
 		btnChanges.alpha(alpha);
 		btnSettings.alpha(alpha);
 		btnAbout.alpha(alpha);
+		btnAIRun.alpha(alpha);
 
 		version.alpha(alpha);
 		btnFade.icon().alpha(alpha);

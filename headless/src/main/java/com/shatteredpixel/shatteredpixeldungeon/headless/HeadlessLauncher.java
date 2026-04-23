@@ -47,7 +47,7 @@ public class HeadlessLauncher {
 		}
 
 		HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-		config.renderInterval = 1f / 60f;
+		config.updatesPerSecond = 60;
 
 		new HeadlessApplication(
 				new ShatteredPixelDungeon(new HeadlessPlatformSupport(), HeadlessScene.class),

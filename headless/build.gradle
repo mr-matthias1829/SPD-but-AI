@@ -14,4 +14,17 @@ processResources {
 dependencies {
     implementation project(':core')
     implementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+}
+
+run {
+    // Forward Gradle project properties to the JVM so users can pass them
+    // with -P instead of -D (avoids PowerShell / Gradle 9 argument-parsing issues).
+    // Usage: ./gradlew :headless:run -Pheadless.steps=300 -Pheadless.heroClass=WARRIOR -Pheadless.seed=demo
+    def headlessProps = ['headless.steps', 'headless.heroClass', 'headless.seed', 'headless.slot', 'headless.basePath']
+    headlessProps.each { prop ->
+        if (project.hasProperty(prop)) {
+            systemProperty prop, project.property(prop)
+        }
+    }
 }
