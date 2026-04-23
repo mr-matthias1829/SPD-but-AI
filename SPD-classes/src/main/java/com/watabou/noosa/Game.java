@@ -289,7 +289,9 @@ public class Game implements ApplicationListener {
 		
 		Game.realTime = TimeUtils.millis();
 
-		inputHandler.processAllEvents();
+		if (inputHandler != null) {
+			inputHandler.processAllEvents();
+		}
 
 		if (platform == null || !platform.isHeadless()){
 			Music.INSTANCE.update();

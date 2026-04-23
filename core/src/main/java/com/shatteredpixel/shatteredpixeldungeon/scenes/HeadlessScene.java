@@ -104,7 +104,7 @@ public class HeadlessScene extends Scene {
 		Dungeon.dailyReplay = false;
 
 		String seed = System.getProperty(PROP_SEED, "");
-		SPDSettings.customSeed(seed == null ? "" : seed.trim());
+		SPDSettings.customSeed(seed.trim());
 
 		Dungeon.initSeed();
 		Dungeon.init();
