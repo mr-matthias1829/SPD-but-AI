@@ -85,35 +85,43 @@ public class Game implements ApplicationListener {
 	
 	@Override
 	public void create() {
-		density = Gdx.graphics.getDensity();
-		if (density == Float.POSITIVE_INFINITY){
-			density = 100f / 160f; //assume 100PPI if density can't be found
-		} else if (DeviceCompat.isDesktop()) {
-			int dispWidth = Gdx.graphics.getDisplayMode().width;
-			int dispHeight = Gdx.graphics.getDisplayMode().height;
-			float reportedWidth = dispWidth / Gdx.graphics.getPpiX();
-			float reportedHeight = dispHeight / Gdx.graphics.getPpiY();
+		if (platform != null && platform.isHeadless()){
+			density = 1f;
+		} else {
+			density = Gdx.graphics.getDensity();
+			if (density == Float.POSITIVE_INFINITY){
+				density = 100f / 160f; //assume 100PPI if density can't be found
+			} else if (DeviceCompat.isDesktop()) {
+				int dispWidth = Gdx.graphics.getDisplayMode().width;
+				int dispHeight = Gdx.graphics.getDisplayMode().height;
+				float reportedWidth = dispWidth / Gdx.graphics.getPpiX();
+				float reportedHeight = dispHeight / Gdx.graphics.getPpiY();
 
-			//this exists because Steam deck reports its display size as 4"x6.3" for some reason
-			// as if in portrait, instead of 6.3"x4". This results in incorrect PPI measurements.
-			// So we check that the orientation of the resolution and the display dimensions match.
-			// If they don't, re-calculate density assuming reported dimensions are flipped.
-			if (dispWidth > dispHeight != reportedWidth > reportedHeight){
-				float realPpiX = dispWidth / reportedHeight;
-				density = realPpiX / 160f;
+				//this exists because Steam deck reports its display size as 4"x6.3" for some reason
+				// as if in portrait, instead of 6.3"x4". This results in incorrect PPI measurements.
+				// So we check that the orientation of the resolution and the display dimensions match.
+				// If they don't, re-calculate density assuming reported dimensions are flipped.
+				if (dispWidth > dispHeight != reportedWidth > reportedHeight){
+					float realPpiX = dispWidth / reportedHeight;
+					density = realPpiX / 160f;
+				}
 			}
 		}
 
-		inputHandler = new InputHandler( Gdx.input );
-		if (ControllerHandler.controllersSupported()){
+		if (Gdx.input != null) {
+			inputHandler = new InputHandler( Gdx.input );
+		}
+		if ((platform == null || !platform.isHeadless()) && ControllerHandler.controllersSupported()){
 			Controllers.addListener(new ControllerHandler());
 		}
 
-		//refreshes texture and vertex data stored on the gpu
-		versionContextRef = Gdx.graphics.getGLVersion();
-		Blending.useDefault();
-		TextureCache.reload();
-		Vertexbuffer.reload();
+		if (platform == null || !platform.isHeadless()){
+			//refreshes texture and vertex data stored on the gpu
+			versionContextRef = Gdx.graphics.getGLVersion();
+			Blending.useDefault();
+			TextureCache.reload();
+			Vertexbuffer.reload();
+		}
 	}
 
 	private GLVersion versionContextRef;
@@ -124,13 +132,15 @@ public class Game implements ApplicationListener {
 			return;
 		}
 
-		//If the EGL context was destroyed, we need to refresh some data stored on the GPU.
-		// This checks that by seeing if GLVersion has a new object reference
-		if (versionContextRef != Gdx.graphics.getGLVersion()) {
-			versionContextRef = Gdx.graphics.getGLVersion();
-			Blending.useDefault();
-			TextureCache.reload();
-			Vertexbuffer.reload();
+		if (platform == null || !platform.isHeadless()){
+			//If the EGL context was destroyed, we need to refresh some data stored on the GPU.
+			// This checks that by seeing if GLVersion has a new object reference
+			if (versionContextRef != Gdx.graphics.getGLVersion()) {
+				versionContextRef = Gdx.graphics.getGLVersion();
+				Blending.useDefault();
+				TextureCache.reload();
+				Vertexbuffer.reload();
+			}
 		}
 
 		if (height != Game.height || width != Game.width) {
@@ -157,6 +167,11 @@ public class Game implements ApplicationListener {
 		if (justResumed){
 			justResumed = false;
 			if (DeviceCompat.isAndroid()) return;
+		}
+
+		if (platform != null && platform.isHeadless()){
+			step();
+			return;
 		}
 
 		NoosaScript.get().resetCamera();
@@ -276,8 +291,10 @@ public class Game implements ApplicationListener {
 
 		inputHandler.processAllEvents();
 
-		Music.INSTANCE.update();
-		Sample.INSTANCE.update();
+		if (platform == null || !platform.isHeadless()){
+			Music.INSTANCE.update();
+			Sample.INSTANCE.update();
+		}
 		scene.update();
 		Camera.updateAll();
 	}

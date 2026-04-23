@@ -36,6 +36,10 @@ public abstract class PlatformSupport {
 	
 	public abstract void updateDisplaySize();
 
+	public boolean isHeadless(){
+		return false; //default
+	}
+
 	public boolean supportsFullScreen(){
 		return true; //default
 	}
