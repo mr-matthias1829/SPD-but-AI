@@ -16,3 +16,13 @@ Shattered Pixel Dungeon currently compiles for Android, iOS, and Desktop platfor
 [![Github Releases](https://shatteredpixel.com/assets/images/badges/github.png)](https://github.com/00-Evan/shattered-pixel-dungeon/releases)
 
 If you like this game, please consider [supporting me on Patreon](https://www.patreon.com/ShatteredPixel)!
+
+## Headless (logic-only)
+
+Run a minimal headless simulation without OpenGL:
+
+```
+./gradlew :headless:run -Dheadless.steps=300 -Dheadless.heroClass=WARRIOR -Dheadless.seed=demo
+```
+
+Optional properties: `headless.slot` (1-based save slot number), `headless.basePath` (default `/tmp/shpd-headless/`), `headless.version`, and `headless.versionCode`.
