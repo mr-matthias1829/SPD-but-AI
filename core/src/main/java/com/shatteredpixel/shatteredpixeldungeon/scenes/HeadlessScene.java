@@ -45,8 +45,9 @@ public class HeadlessScene extends Scene {
 	private static final String PROP_SLOT = "headless.slot";
 	private static final String PROP_BASE_PATH = "headless.basePath";
 
-	// Static fields that the headed UI can set before switching to this scene.
-	// When non-null/-1, these take precedence over system properties.
+	// Static config set by the headed UI before switching to this scene.
+	// Always written and read from the render/game thread, so no synchronization needed.
+	// Cleared in finishRun() to prevent state leaking into subsequent runs.
 	public static int uiSteps = -1;
 	public static HeroClass uiHeroClass = null;
 	public static String uiSeed = null;
