@@ -30,9 +30,18 @@ import com.watabou.noosa.Game;
 public class HeadlessLauncher {
 
 	public static void main(String[] args) {
-		Game.version = System.getProperty("Specification-Version", "0.0.0-headless");
+		String version = System.getProperty("headless.version");
+		if (version == null || version.trim().isEmpty()) {
+			version = System.getProperty("Specification-Version", "0.0.0-headless");
+		}
+		Game.version = version;
+
+		String versionCodeValue = System.getProperty("headless.versionCode");
+		if (versionCodeValue == null || versionCodeValue.trim().isEmpty()) {
+			versionCodeValue = System.getProperty("Implementation-Version", "0");
+		}
 		try {
-			Game.versionCode = Integer.parseInt(System.getProperty("Implementation-Version", "0"));
+			Game.versionCode = Integer.parseInt(versionCodeValue);
 		} catch (NumberFormatException e) {
 			Game.versionCode = 0;
 		}

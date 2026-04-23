@@ -25,4 +25,4 @@ Run a minimal headless simulation without OpenGL:
 ./gradlew :headless:run -Dheadless.steps=300 -Dheadless.heroClass=WARRIOR -Dheadless.seed=demo
 ```
 
-Optional properties: `headless.slot` (1-based save slot number) and `headless.basePath` (default `/tmp/shpd-headless/`).
+Optional properties: `headless.slot` (1-based save slot number), `headless.basePath` (default `/tmp/shpd-headless/`), `headless.version`, and `headless.versionCode`.

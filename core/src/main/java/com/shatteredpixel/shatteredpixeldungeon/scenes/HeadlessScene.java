@@ -46,7 +46,7 @@ public class HeadlessScene extends Scene {
 
 	private Thread actorThread;
 	private int stepsRemaining;
-	private float notifyDelay = 1f / 60f;
+	private float actorThreadNotifyInterval = 1f / 60f;
 
 	@Override
 	public void create() {
@@ -171,12 +171,12 @@ public class HeadlessScene extends Scene {
 			return;
 		}
 
-		if (notifyDelay > 0f) {
-			notifyDelay -= Game.elapsed;
+		if (actorThreadNotifyInterval > 0f) {
+			actorThreadNotifyInterval -= Game.elapsed;
 			return;
 		}
 
-		notifyDelay = 1f / 60f;
+		actorThreadNotifyInterval = 1f / 60f;
 		synchronized (actorThread) {
 			actorThread.notify();
 		}
@@ -184,7 +184,7 @@ public class HeadlessScene extends Scene {
 
 	private void finishRun() {
 		Gdx.app.log("Headless", "Finished run: depth=" + Dungeon.depth
-				+ " heroPos=" + (Dungeon.hero == null ? -1 : Dungeon.hero.pos)
+				+ " heroPos=" + (Dungeon.hero == null ? "none" : Dungeon.hero.pos)
 				+ " time=" + Actor.now());
 		stopActorThread();
 		Game.instance.finish();
