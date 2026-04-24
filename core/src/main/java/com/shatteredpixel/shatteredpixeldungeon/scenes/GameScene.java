@@ -158,6 +158,12 @@ public class GameScene extends PixelScene {
 
 	static GameScene scene;
 
+	/**
+	 * When true, the AI (hero.rest) is invoked automatically every frame instead of waiting
+	 * for player input. Enables "headed" AI runs that can be watched in real time.
+	 */
+	public static boolean aiMode = false;
+
 	private SkinnedBlock water;
 	private DungeonTerrainTilemap tiles;
 	private GridTileMap visualGrid;
@@ -777,6 +783,7 @@ public class GameScene extends PixelScene {
 		Emitter.freezeEmitters = false;
 		
 		scene = null;
+		aiMode = false;
 		Badges.saveGlobal();
 		Journal.saveGlobal();
 		
@@ -890,6 +897,10 @@ public class GameScene extends PixelScene {
 
 		if (Dungeon.hero.ready && Dungeon.hero.paralysed == 0) {
 			log.newLine();
+			// AI (headed) mode: auto-rest instead of waiting for player input
+			if (aiMode) {
+				Dungeon.hero.rest(false);
+			}
 		}
 
 		if (updateTags){
